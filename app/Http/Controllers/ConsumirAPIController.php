@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Model\Operacao;
 use App\Model\Utilizador;
 use App\Model\Tipo;
+use App\Model\Tarefa;
 use App\Model\Origem;
 Use Exception;
 
@@ -54,17 +55,17 @@ class ConsumirAPIController extends Controller
                     'acTitulo' => $tarefa->titulo,                                                                              
                     'acDescripcao' => $tarefa->descricao,                                                                                                                                                                                                                                                    
                     'acAvanco' => $tarefa->avanco,                              
-                    'DataSolicitacao' => $tarefa->data_solicitacao,         
-                    'DataPrevista' => $tarefa->data_prevista,            
-                    'DataReativacao' => $tarefa->data_reactivacao,          
+                    'DataSolicitacao' => date('Ymd H:i:s',strtotime($tarefa->data_solicitacao)),         
+                    'DataPrevista' => date('Ymd H:i:s',strtotime($tarefa->data_prevista)),            
+                    'DataReativacao' => date('Ymd H:i:s',strtotime($tarefa->data_reactivacao)),          
                     'acResponsavel' => $tarefa->responsavel,
                     //'acDSOPeriodo' => $tarefa-> 
                     //'acDSOFeito' => $tarefa->
-                    'DataCumprimento' => $tarefa->data_cumprimento,         
-                    'DataEnvio' => $tarefa->data_envio,               
+                    'DataCumprimento' => date('Ymd H:i:s',strtotime($tarefa->data_cumprimento)),         
+                    'DataEnvio' => date('Ymd H:i:s',strtotime($tarefa->data_envio)),               
                     'acTempo' => $tarefa->tempo,
                     'utRegisto' => $tarefa->ut_registo,       
-                    'DataRegisto' => $tarefa->created_at             
+                    'DataRegisto' => date('Ymd H:i:s',strtotime($tarefa->created_at))             
                     //'utReclamo' => $tarefa->       
                     //'DataReclamo' => $tarefa->
                 ])){
@@ -75,7 +76,7 @@ class ConsumirAPIController extends Controller
                 return back()->with('sucesso','Registada com sucesso.');
             }
         } catch (Exception $e){
-            return back()->with('error','Erro ao registar actividade ou actividade já existe.');
+            return back()->with('error','Houve um erro ao registar actividade ou actividade já existente.');
         }
     }
 
@@ -126,16 +127,16 @@ class ConsumirAPIController extends Controller
                     foreach($operacoes as $op){                       
                         if(DB::table('tKxACTarefaOperacao')->insert([
                             'acCodigo' => $op->codigo,
-                            'DataOperacao' => date('Y-m-d H:i:s'),                                
+                            'DataOperacao' => date('Ymd H:i:s'),                                
                             'acOrigemDado' => $op->acOrigemDado,
                             'utCodigo' => $op->utilizador_codigo,
                             'Descricao' => $op->descricao,
                             'acEstado' => $op->estado,
                             'acAvanco' => $op->avanco,
-                            'DataEnvio' => date('Y-m-d H:i:s'),
+                            'DataEnvio' => date('Ymd H:i:s'),
                             'acTempo' => $op->tempo_acao,
                             'utRegisto' => $op->utilizador_registo,
-                            'DataRegisto' => date('Y-m-d H:i:s'),
+                            'DataRegisto' => date('Ymd H:i:s'),
                             'utPergunta' => $op->utilizador_pergunta
                         ])){
                             $status = true;     
@@ -332,7 +333,6 @@ class ConsumirAPIController extends Controller
         }
     }
 
-
     //Salvar origens vindo do Kixipedidos para kixiagenda
     public function salvarTipoOrigemnoKA(){
         try {
@@ -356,6 +356,61 @@ class ConsumirAPIController extends Controller
                 }
             }
             $status ? 'Sucesso': 'Erro';
+        } catch (RequestException $e) {
+            echo GuzzleHttp\Psr7\str($e->getRequest());
+            if ($e->hasResponse()) {
+                echo GuzzleHttp\Psr7\str($e->getResponse());
+            }
+        }
+    }
+
+    //Salvar tarefas vindo do Kixipedidos para kixiagenda
+    public function exportarTarefasParaKA(){
+        try {
+            $client = new Client(); //GuzzleHttp\Client
+            $url = "http://192.168.5.83:8080/kixiagenda/public/api/sincronizarTarefas"; 
+            $tarefas = Tarefa::exportarTarefas();
+            $status;
+            $cont=0;//dd($tarefas);
+
+            foreach($tarefas as $tf){
+                $response = $client->request('POST', $url, [
+                    'form_params' => [
+                        'departamento_origem' => $tf->Departamento,
+                        'departamento_destino' => $tf->PraDepartamento,
+                        'solicitante' => $tf->utCodigo,
+                        'responsavel' => $tf->acResponsavel,
+                        'ut_registo' => $tf->utRegisto,
+                        'titulo' => $tf->acTitulo,
+                        'descricao' => $tf->acDescripcao,
+                        'avanco' => $tf->acAvanco,
+                        'tempo' => $tf->acTempo,
+                        'id_tipo' => $tf->acTipo,
+                        'id_origem' => $tf->acOrigem,
+                        'origem_dado' => $tf->acOrigemDado,
+                        'data_solicitacao' => $tf->DataSolicitacao,
+                        'data_prevista' => $tf->DataPrevista,
+                        'data_reactivacao' => $tf->DataReativacao,
+                        'data_cumprimento' => $tf->DataCumprimento,
+                        'data_envio' => $tf->DataEnvio,
+                        'codigo' => $tf->acCodigo,
+                        'id_dpto_origem' => $tf->OfCodigo,
+                        'id_dpto_destino' => $tf->PraOfCodigo,
+                        'versao_sistema' => 'KAW100',
+                        //'id_user' => 'f8b11db7-8b87-4d88-b5e6-01f14950afd5',
+                        'created_at' => $tf->DataRegisto,
+                        'updated_at' => $tf->DataRegisto,
+                    ]
+                ]);
+       
+                if($response->getStatusCode() == "200"){
+                    $status=true;
+                    $cont++;
+                }else{
+                    $status=false;
+                }
+            }
+            $status ? 'Sucesso':'Erro';dd($cont);
         } catch (RequestException $e) {
             echo GuzzleHttp\Psr7\str($e->getRequest());
             if ($e->hasResponse()) {

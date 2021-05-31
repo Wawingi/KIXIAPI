@@ -45,7 +45,9 @@ Route::get('salvarTiponoKA','ConsumirAPIController@salvarTiponoKA');
 Route::get('listarOrigens','ConsumirAPIController@listarOrigens');
 Route::get('salvarOrigemnoKA','ConsumirAPIController@salvarOrigemnoKA');
 
-Route::get('salvarTipoOrigemnoKAAA','ConsumirAPIController@salvarTipoOrigemnoKA');
+Route::get('salvarTipoOrigemnoKA','ConsumirAPIController@salvarTipoOrigemnoKA');
+
+Route::get('exportarTarefasParaKA','ConsumirAPIController@exportarTarefasParaKA');
 
 
 
