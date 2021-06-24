@@ -10,7 +10,9 @@ use App\Model\Utilizador;
 use App\Model\Tipo;
 use App\Model\Tarefa;
 use App\Model\Origem;
-Use Exception;
+//Use Exception;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\TarefasImport;
 
 class ConsumirAPIController extends Controller
 {
@@ -41,6 +43,9 @@ class ConsumirAPIController extends Controller
         try{
             $tarefas = $this->getTarefasAPI();
             foreach($tarefas as $tarefa){
+                if($tarefa->data_cumprimento==null) $dt_cumpimento=NULL; else $dt_cumpimento=date('Ymd H:i:s',strtotime($tarefa->data_cumprimento));
+                if($tarefa->data_reactivacao==null) $dt_reactivacao=NULL; else $dt_reactivacao=date('Ymd H:i:s',strtotime($tarefa->data_reactivacao));
+              
                 if(DB::table('tKxACTarefa')->insert([ 
                     'acCodigo' => $tarefa->codigo,
                     'acOrigemArquivo' => $tarefa->versao_sistema, 
@@ -57,11 +62,11 @@ class ConsumirAPIController extends Controller
                     'acAvanco' => $tarefa->avanco,                              
                     'DataSolicitacao' => date('Ymd H:i:s',strtotime($tarefa->data_solicitacao)),         
                     'DataPrevista' => date('Ymd H:i:s',strtotime($tarefa->data_prevista)),            
-                    'DataReativacao' => date('Ymd H:i:s',strtotime($tarefa->data_reactivacao)),          
+                    'DataReativacao' => $dt_reactivacao,          
                     'acResponsavel' => $tarefa->responsavel,
                     //'acDSOPeriodo' => $tarefa-> 
                     //'acDSOFeito' => $tarefa->
-                    'DataCumprimento' => date('Ymd H:i:s',strtotime($tarefa->data_cumprimento)),         
+                    'DataCumprimento' => $dt_cumpimento,         
                     'DataEnvio' => date('Ymd H:i:s',strtotime($tarefa->data_envio)),               
                     'acTempo' => $tarefa->tempo,
                     'utRegisto' => $tarefa->ut_registo,       
@@ -121,38 +126,64 @@ class ConsumirAPIController extends Controller
             $client = new Client();
             //$url = "http://192.168.5.83:8080/kixiagenda/public/api/getOperacaoAPI";
             $url = "http://kixiagenda.kixicredito.com/public/api/getOperacaoAPI";
+            $statusExist=0;
+            $statusNovo=0;
             $response = $client->request('GET', $url);
                 if($response->getStatusCode() == "200"){
                     $operacoes = json_decode($response->getBody());
-                    foreach($operacoes as $op){                       
-                        if(DB::table('tKxACTarefaOperacao')->insert([
-                            'acCodigo' => $op->codigo,
-                            'DataOperacao' => date('Ymd H:i:s'),                                
-                            'acOrigemDado' => $op->acOrigemDado,
-                            'utCodigo' => $op->utilizador_codigo,
-                            'Descricao' => $op->descricao,
-                            'acEstado' => $op->estado,
-                            'acAvanco' => $op->avanco,
-                            'DataEnvio' => date('Ymd H:i:s'),
-                            'acTempo' => $op->tempo_acao,
-                            'utRegisto' => $op->utilizador_registo,
-                            'DataRegisto' => date('Ymd H:i:s'),
-                            'utPergunta' => $op->utilizador_pergunta
-                        ])){
-                            $status = true;     
-                        }
+                    foreach($operacoes as $op){ 
+                        //Verificar se já existe uma acção registada                                       
+                        $existOperacao=Operacao::select('acCodigo','acAvanco','DataOperacao')->where([['acCodigo','=',$op->codigo],['acAvanco','=',$op->avanco],['DataOperacao','=',date('Ymd H:i:s',strtotime($op->created_at))]])->count();
+                        
+                        //dd($existOperacao);
+                        //dd($op);
+
+                        if($existOperacao==0){
+                            if(DB::table('tKxACTarefaOperacao')->insert([
+                                'acCodigo' => $op->codigo,
+                                'DataOperacao' => date('Ymd H:i:s',strtotime($op->created_at)),                                
+                                'acOrigemDado' => $op->acOrigemDado,
+                                'utCodigo' => $op->utilizador_codigo,
+                                'Descricao' => $op->descricao,
+                                'acEstado' => $op->estado,
+                                'acAvanco' => $op->avanco,
+                                'DataEnvio' => date('Ymd H:i:s',strtotime($op->created_at)),
+                                'acTempo' => $op->tempo_acao,
+                                'utRegisto' => $op->utilizador_registo,
+                                'DataRegisto' => date('Ymd H:i:s',strtotime($op->created_at)),
+                                'utPergunta' => $op->utilizador_pergunta
+                            ])){ 
+                               ++$statusNovo; 
+                                /* DB::table('tKxACTarefa')          
+                                ->where('acCodigo','=',$op->codigo)
+                                ->update(['acAvanco' => $op->avanco]);
+
+                                //Actividade cumprida
+                                if($op->avanco==100){
+                                    DB::table('tKxACTarefa')          
+                                    ->where('acCodigo','=',$op->codigo)
+                                    ->update(['DataCumprimento' => date('Ymd H:i:s',strtotime($op->updated_at))]);
+                                }
+
+                                //Actividade reagendada
+                                if($op->estado=='ACRG'){
+                                    DB::table('tKxACTarefa')          
+                                    ->where('acCodigo','=',$op->codigo)
+                                    ->update(['DataPrevista' => date('Ymd H:i:s',strtotime($op->created_at))]);
+                                } */                                    
+                            }
+                        }else{
+                            ++$statusExist;
+                        }                      
                     }   
                     
-                    if($status)
-                        return back()->with('sucesso','Acções registadas com sucesso.');
+                    return back()->with('sucesso',$statusNovo.' Acções registadas com sucesso. Houve '.$statusExist.' Acções Já existentes');
                     
                 }else{
                     return back()->with('error','Erro ao registar acções.');
                 }
-        } catch (QueryException $e) {
-                dd('errorr');
-                echo Psr7\str($e->getRequest());
-                echo Psr7\str($e->getResponse());
+        } catch (Exception $e) {
+            return back()->with('error','Houve um erro ao registar acção ou actividade ainda não registada.');
         }
     }
 
@@ -417,6 +448,13 @@ class ConsumirAPIController extends Controller
                 echo GuzzleHttp\Psr7\str($e->getResponse());
             }
         }
+    }
+
+    public function importarTarefas(Request $request){
+        //dd($request);
+        Excel::import(new TarefasImport, $request->ficheiro);
+        
+        return redirect('/')->with('success', 'All good!');
     }
 
 }

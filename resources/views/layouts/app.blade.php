@@ -31,15 +31,14 @@
     <!-- Inicio da Content -->
         @yield('content')
     <!-- Fim da Content -->
+
+    <!-- App js -->
+    <script src="{{ asset('js/app.min.js') }}"></script>
                                   
     <!-- jQuery  -->
-    
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/metisMenu.min.js') }}"></script>
     <script src="{{ asset('js/waves.min.js') }}"></script>
     <script src="{{ asset('js/jquery.slimscroll.min.js') }}"></script>
-    
-    <!-- App js -->
-    <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

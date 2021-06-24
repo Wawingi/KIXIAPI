@@ -8,6 +8,7 @@ class Tarefa extends Model
 {
     protected $table='tKxACTarefa';
 
+    protected $fillable=['acCodigo'];
 
     //Listar utilizadores registados no kixipedidos
     public static function exportarTarefas(){
