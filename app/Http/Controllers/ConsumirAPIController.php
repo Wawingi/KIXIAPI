@@ -26,7 +26,7 @@ class ConsumirAPIController extends Controller
             $response = $client->request('GET', $url);        
                 if($response->getStatusCode() == "200"){
                     return json_decode($response->getBody());
-                }else{dd('kk');
+                }else{
                     return response()->json(['status',"error"]);
                 }
         } catch (RequestException $e) {
@@ -41,6 +41,7 @@ class ConsumirAPIController extends Controller
 
     public function salvarTarefa(){
         try{
+            $contOK=0;
             $tarefas = $this->getTarefasAPI();
             foreach($tarefas as $tarefa){
                 if($tarefa->data_cumprimento==null) $dt_cumpimento=NULL; else $dt_cumpimento=date('Ymd H:i:s',strtotime($tarefa->data_cumprimento));
@@ -74,11 +75,12 @@ class ConsumirAPIController extends Controller
                     //'utReclamo' => $tarefa->       
                     //'DataReclamo' => $tarefa->
                 ])){
+                    ++$contOK;
                     $status = true;  
                 }
             }
             if($status){
-                return back()->with('sucesso','Registada com sucesso.');
+                return back()->with('sucesso','Registadas ['.$contOK.'] actividades com sucesso.');
             }
         } catch (Exception $e){
             return back()->with('error','Houve um erro ao registar actividade ou actividade já existente.');
