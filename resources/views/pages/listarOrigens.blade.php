@@ -74,33 +74,39 @@
  
     <div class="row">
         <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h4 style="text-align:center;color:#f5b119d4">ORIGENS DO KIXIPEDIDOS</h4>
-                <table id="#" class="table table-striped mb-0">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Código</th>
-                        <th>Tipo</th>
-                        <th>Tipo Abreviado</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($origens as $origem)
+            <div class="card">
+                <div class="card-body">
+                    <h4 style="text-align:center;color:#f5b119d4">ORIGENS DO KIXIPEDIDOS</h4>
+                    <table id="#" class="table table-striped mb-0">
+                        <thead>
                         <tr>
-                            <td>{{$loop->iteration}}</td>
-                            <td>{{$origem->acOrigem}}</td>
-                            <td>{{$origem->acOTitulo}}</td>
-                            <td>{{$origem->acODado}}</td>
+                            <th>#</th>
+                            <th>Código</th>
+                            <th>Tipo</th>
+                            <th>Tipo Abreviado</th>
                         </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach($origens as $origem)
+                            <tr>
+                                <td>{{$loop->iteration}}</td>
+                                <td>{{$origem->acOrigem}}</td>
+                                <td>{{$origem->acOTitulo}}</td>
+                                <td>{{$origem->acODado}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        </div>
     </div>
+
+    <form method="POST" action="{{ url('registarTeste')}}"> 
+        @csrf     
+        <textarea name="descricao" class="form-control form-control-sm corInput"></textarea>  
+        <button type="submit">OK</button>                           
+    </form> 
    
     <!-- FIm do corpo -->
 </div>

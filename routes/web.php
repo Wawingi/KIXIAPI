@@ -52,6 +52,9 @@ Route::get('exportarTarefasParaKA','ConsumirAPIController@exportarTarefasParaKA'
 Route::post('importarTarefas','ConsumirAPIController@importarTarefas');
 
 
+Route::post('registarTeste','ConsumirAPIController@registarTeste');
+
+
 
 
 

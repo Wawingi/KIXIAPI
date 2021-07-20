@@ -10,7 +10,7 @@ use App\Model\Utilizador;
 use App\Model\Tipo;
 use App\Model\Tarefa;
 use App\Model\Origem;
-//Use Exception;
+Use Exception;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\TarefasImport;
 
@@ -83,7 +83,7 @@ class ConsumirAPIController extends Controller
                 return back()->with('sucesso','Registadas ['.$contOK.'] actividades com sucesso.');
             }
         } catch (Exception $e){
-            return back()->with('error','Houve um erro ao registar actividade ou actividade já existente.');
+            return back()->with('error','Houve um erro ao registar actividade ou actividade já existente. Foram registadas ['.$contOK.'] actividades');
         }
     }
 
@@ -155,24 +155,7 @@ class ConsumirAPIController extends Controller
                                 'DataRegisto' => date('Ymd H:i:s',strtotime($op->created_at)),
                                 'utPergunta' => $op->utilizador_pergunta
                             ])){ 
-                               ++$statusNovo; 
-                                /* DB::table('tKxACTarefa')          
-                                ->where('acCodigo','=',$op->codigo)
-                                ->update(['acAvanco' => $op->avanco]);
-
-                                //Actividade cumprida
-                                if($op->avanco==100){
-                                    DB::table('tKxACTarefa')          
-                                    ->where('acCodigo','=',$op->codigo)
-                                    ->update(['DataCumprimento' => date('Ymd H:i:s',strtotime($op->updated_at))]);
-                                }
-
-                                //Actividade reagendada
-                                if($op->estado=='ACRG'){
-                                    DB::table('tKxACTarefa')          
-                                    ->where('acCodigo','=',$op->codigo)
-                                    ->update(['DataPrevista' => date('Ymd H:i:s',strtotime($op->created_at))]);
-                                } */                                    
+                               ++$statusNovo;                          
                             }
                         }else{
                             ++$statusExist;
@@ -402,9 +385,12 @@ class ConsumirAPIController extends Controller
         try {
             $client = new Client(); //GuzzleHttp\Client
             $url = "http://192.168.5.83:8080/kixiagenda/public/api/sincronizarTarefas"; 
+            //$url = "http://kixiagenda.kixicredito.com/public/api/sincronizarTarefas";  
             $tarefas = Tarefa::exportarTarefas();
             $status;
-            $cont=0;//dd($tarefas);
+            $cont=0;
+            
+            //dd($tarefas);
 
             foreach($tarefas as $tf){
                 $response = $client->request('POST', $url, [
@@ -457,6 +443,10 @@ class ConsumirAPIController extends Controller
         Excel::import(new TarefasImport, $request->ficheiro);
         
         return redirect('/')->with('success', 'All good!');
+    }
+
+    public function registarTeste(Request $request){
+        dd($request->descricao."\r\n".'==>Acordeon');
     }
 
 }
