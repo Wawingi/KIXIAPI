@@ -181,7 +181,7 @@ class ConsumirAPIController extends Controller
            
             $response = $client->request('GET', $url);
                 if($response->getStatusCode() == "200"){
-                    return count(json_decode($response->getBody()));   
+                    return json_decode($response->getBody());   
                 }else{
                     return 0;
                 }
@@ -193,7 +193,8 @@ class ConsumirAPIController extends Controller
     //Listar utilizadores registados no kixipedidos
     public function listarUtilizadores(){
         $Utilizadores = Utilizador::getUtilizadores();
-        $contUtilizadoresKA = $this->pegaUtilizadoresKA();
+        $contUtilizadoresKA = count($this->pegaUtilizadoresKA()); 
+ 
         return view('pages.listarUtilizadores',compact('Utilizadores','contUtilizadoresKA'));
     }
 

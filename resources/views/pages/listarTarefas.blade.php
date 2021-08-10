@@ -30,7 +30,7 @@
     </div> 
     @endif    
     @if(session('error')) 
-    <div style="height:40px;background:#ff8e8e" class="alert icon-custom-alert  alert-outline-danger b-round fade show" role="alert">                                            
+    <div style="height:40px;background:#ffb459" class="alert icon-custom-alert  alert-outline-warning b-round fade show" role="alert">                                            
         <div style="color:#000" class="alert-text">
             {{ session('error')}}
         </div>        
