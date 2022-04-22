@@ -13,4 +13,12 @@ class Utilizador extends Model
                         ->select('UtCodigo','Nombre01','Nombre02','Nombre03','departamento','CorreioI','UtSenha','Imagen')
                         ->get();
     }
+
+    //Pegar utilizador por ut codigo
+    public static function getUtilizadorByUsername($username){
+        return Utilizador::where('Activo',1)
+                        ->where('UtCodigo',$username)
+                        ->select('UtCodigo','Nombre01','Nombre02','Nombre03','departamento','CorreioI','UtSenha','Imagen')
+                        ->first();
+    }
 }

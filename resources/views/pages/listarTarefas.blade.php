@@ -42,20 +42,6 @@
     </div>  
     @endif
 
-    <form method="post" action="{{ url('importarTarefas') }}" enctype="multipart/form-data">
-        @csrf         
-        <div class="row">
-            <div class="col-10">
-                <div class="form-group">
-                    <input type="file" class="form-control" name="ficheiro">
-                </div>
-            </div>  
-            <div class="col-2">
-                <button type="submit" class="btn btn-sm btn-primary waves-effect waves-light"><i class="mdi mdi-content-save mr-1"></i>Registar</button>   
-            </div>  
-        </div>
-    </form>
-
     <hr>
     <!-- Inicio do corpo -->
     <div class="card">

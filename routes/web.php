@@ -36,7 +36,7 @@ Route::get('pegaTarefas','ConsumirAPIController@pegaTarefas');
 Route::get('pegaOperacoes','ConsumirAPIController@pegaOperacoes');
 
 Route::get('listarUtilizadores','ConsumirAPIController@listarUtilizadores');
-Route::get('salvarUtilizadornoKA','ConsumirAPIController@salvarUtilizadornoKA');
+Route::get('salvarUtilizadornoKA/{username}','ConsumirAPIController@salvarUtilizadornoKA');
 
 
 Route::get('listarTipos','ConsumirAPIController@listarTipos');
@@ -51,11 +51,9 @@ Route::get('exportarTarefasParaKA','ConsumirAPIController@exportarTarefasParaKA'
 
 Route::post('importarTarefas','ConsumirAPIController@importarTarefas');
 
-
 Route::post('registarTeste','ConsumirAPIController@registarTeste');
 
 
 
-
-
+Route::get('testeLOGIN','ConsumirAPIController@testeLOGIN');
 

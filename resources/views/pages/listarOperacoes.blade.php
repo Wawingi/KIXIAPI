@@ -61,10 +61,10 @@
                     <thead>
                     <tr>
                         <th>#</th>
+                        <th>Código</th>
                         <th>Responsável</th>
                         <th>Descrição</th>
                         <th>Estado</th>
-                        <th>Avanço</th>
                         <th>Data</th>
                     </tr>
                     </thead>
@@ -72,10 +72,10 @@
                         @foreach($operacoes as $op)
                         <tr>
                             <td>{{$loop->iteration}}</td>
+                            <td>{{$op->codigo}}</td>
                             <td>{{$op->utilizador_codigo}}</td>
                             <td>{{$op->descricao}}</td>
                             <td>{{$op->estado}}</td>
-                            <td>{{$op->avanco}}</td>
                             <td>{{ date('d-m-Y H:i:s', strtotime($op->updated_at)) }}</td>
                         </tr>
                         @endforeach

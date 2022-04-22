@@ -101,13 +101,6 @@
             </div>
         </div>
     </div>
-
-    <form method="POST" action="{{ url('registarTeste')}}"> 
-        @csrf     
-        <textarea name="descricao" class="form-control form-control-sm corInput"></textarea>  
-        <button type="submit">OK</button>                           
-    </form> 
-   
     <!-- FIm do corpo -->
 </div>
 <script>

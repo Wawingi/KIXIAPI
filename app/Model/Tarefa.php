@@ -12,9 +12,9 @@ class Tarefa extends Model
 
     //Listar utilizadores registados no kixipedidos
     public static function exportarTarefas(){
-        return Tarefa::select('Departamento','PraDepartamento','utCodigo','acResponsavel','utRegisto','acTitulo','acDescripcao','acAvanco','acTempo','acTipo','acOrigem','acOrigemDado','DataSolicitacao','DataPrevista','DataReativacao','DataCumprimento','DataEnvio','acCodigo','OfCodigo','PraOfCodigo','DataRegisto')
+        return Tarefa::select('acOrigemArquivo','Departamento','PraDepartamento','utCodigo','acResponsavel','utRegisto','acTitulo','acDescripcao','acAvanco','acTempo','acTipo','acOrigem','acOrigemDado','DataSolicitacao','DataPrevista','DataReativacao','DataCumprimento','DataEnvio','acCodigo','OfCodigo','PraOfCodigo','DataRegisto')
                     ->where('acAvanco','<',100)
-                    ->where('acCodigo','=','LI2359KV')
+                    ->where('acCodigo','=','01200443')
                     ->get();
     }
 }

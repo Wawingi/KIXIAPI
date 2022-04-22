@@ -29,8 +29,8 @@ class ConsumirAPIController extends Controller
                 }else{
                     return response()->json(['status',"error"]);
                 }
-        } catch (RequestException $e) {
-
+        } catch (Exception $e) {
+            dd($e);
         }
     }
 
@@ -136,9 +136,6 @@ class ConsumirAPIController extends Controller
                     foreach($operacoes as $op){ 
                         //Verificar se já existe uma acção registada                                       
                         $existOperacao=Operacao::select('acCodigo','acAvanco','DataOperacao')->where([['acCodigo','=',$op->codigo],['acAvanco','=',$op->avanco],['DataOperacao','=',date('Ymd H:i:s',strtotime($op->created_at))]])->count();
-                        
-                        //dd($existOperacao);
-                        //dd($op);
 
                         if($existOperacao==0){
                             if(DB::table('tKxACTarefaOperacao')->insert([
@@ -193,40 +190,56 @@ class ConsumirAPIController extends Controller
     //Listar utilizadores registados no kixipedidos
     public function listarUtilizadores(){
         $Utilizadores = Utilizador::getUtilizadores();
-        $contUtilizadoresKA = count($this->pegaUtilizadoresKA()); 
- 
-        return view('pages.listarUtilizadores',compact('Utilizadores','contUtilizadoresKA'));
+        $utilizadoresKA = $this->pegaUtilizadoresKA();        
+        $contUtilizadoresKA = count($utilizadoresKA); 
+
+        //Construção de array de dados vindo de array de objectos de utilizador de Kixiagenda Web
+        $usersKA = array();
+        $usersFalta = array();
+
+        foreach($utilizadoresKA as $uKA){
+            array_push($usersKA,$uKA->username); 
+        }
+
+        foreach($Utilizadores as $utilizador){
+            if(!in_array($utilizador->UtCodigo,$usersKA) )
+            {
+                array_push($usersFalta,$utilizador);
+            }
+        }
+        
+        return view('pages.listarUtilizadores',compact('usersFalta','contUtilizadoresKA'));
     }
 
     //Salvar utilizadores vindo do Kixipedidos para kixiagenda
-    public function salvarUtilizadornoKA(){
+    public function salvarUtilizadornoKA($username){
         try {
             $client = new Client(); //GuzzleHttp\Client
             //$url = "http://192.168.5.83:8080/kixiagenda/public/api/registarUtilizadorAPI"; 
             $url = "http://kixiagenda.kixicredito.com/public/api/registarUtilizadorAPI";
 
-            $Utilizadores = Utilizador::getUtilizadores();
-            $contSucesso=0;
-
-            foreach($Utilizadores as $utilizador){
-                $response = $client->request('POST', $url, [
-                    'form_params' => [
-                        'UtCodigo' => $utilizador->UtCodigo,
-                        'name' => $utilizador->Nombre01.' '.$utilizador->Nombre02.' '.$utilizador->Nombre03,
-                        'departamento' => $utilizador->departamento,
-                        'CorreioI' => $utilizador->CorreioI,
-                        'UtSenha' => $utilizador->UtSenha,
-                        'Imagen' =>  $utilizador->Imagen
-                    ]
-                ]);
-                //dd($response);
-                if($response->getStatusCode() == "200"){
-                    $contSucesso++;
-                }else{
-                    //return response()->json(['status',"error"]);
-                }
+            $utilizador = Utilizador::getUtilizadorByUsername($username);
+         
+            $response = $client->request('POST', $url, [
+                'form_params' => [
+                    'UtCodigo' => $utilizador->UtCodigo,
+                    'name' => $utilizador->Nombre01.' '.$utilizador->Nombre02.' '.$utilizador->Nombre03,
+                    'departamento' => $utilizador->departamento,
+                    'CorreioI' => $utilizador->CorreioI,
+                    'UtSenha' => $utilizador->UtSenha,
+                    'Imagen' =>  $utilizador->Imagen
+                ]
+            ]);
+            
+            //dd(json_decode($response->getBody()));
+            
+            if($response->getStatusCode() == "200"){
+                return response()->json('Sincronizado com sucesso',200);
+            }else{
+                return response()->json('Erro ao sincronizar');
             }
-            return back()->with('sucesso','Registados '.$contSucesso.' utilizadores.'); 
+            
+            //return back()->with('sucesso','Registados '.$contSucesso.' utilizadores.'); 
         } catch (RequestException $e) {
             echo GuzzleHttp\Psr7\str($e->getRequest());
             if ($e->hasResponse()) {
@@ -276,7 +289,7 @@ class ConsumirAPIController extends Controller
                         'tipo_abreviado' => $tipo->acTipoAbreviado,
                     ]
                 ]);
-                //dd($response);
+       
                 if($response->getStatusCode() == "200"){
                     $contSucesso++;
                 }else{
@@ -320,8 +333,8 @@ class ConsumirAPIController extends Controller
     public function salvarOrigemnoKA(){
         try {
             $client = new Client(); //GuzzleHttp\Client
-            //$url = "http://192.168.5.83:8080/kixiagenda/public/api/registarOrigemAPI"; 
-            $url = "http://kixiagenda.kixicredito.com/public/api/registarOrigemAPI";
+            $url = "http://192.168.5.83:8080/kixiagenda/public/api/registarOrigemAPI"; 
+            //$url = "http://kixiagenda.kixicredito.com/public/api/registarOrigemAPI";
             $origens = Origem::getOrigens();
             $contSucesso=0;
 
@@ -385,8 +398,8 @@ class ConsumirAPIController extends Controller
     public function exportarTarefasParaKA(){
         try {
             $client = new Client(); //GuzzleHttp\Client
-            $url = "http://192.168.5.83:8080/kixiagenda/public/api/sincronizarTarefas"; 
-            //$url = "http://kixiagenda.kixicredito.com/public/api/sincronizarTarefas";  
+            //$url = "http://192.168.5.83:8080/kixiagenda/public/api/sincronizarTarefas"; 
+            $url = "http://kixiagenda.kixicredito.com/public/api/sincronizarTarefas";  
             $tarefas = Tarefa::exportarTarefas();
             $status;
             $cont=0;
@@ -416,7 +429,7 @@ class ConsumirAPIController extends Controller
                         'codigo' => $tf->acCodigo,
                         'id_dpto_origem' => $tf->OfCodigo,
                         'id_dpto_destino' => $tf->PraOfCodigo,
-                        'versao_sistema' => 'KAW100',
+                        'versao_sistema' => $tf->acOrigemArquivo,
                         //'id_user' => 'f8b11db7-8b87-4d88-b5e6-01f14950afd5',
                         'created_at' => $tf->DataRegisto,
                         'updated_at' => $tf->DataRegisto,
@@ -448,6 +461,37 @@ class ConsumirAPIController extends Controller
 
     public function registarTeste(Request $request){
         dd($request->descricao."\r\n".'==>Acordeon');
+    }
+
+    //COBAIAAAAAAAAAAAAAAAAAAAAAAAAA
+    public function testeLOGIN(){
+        try {
+            $client = new Client(); //GuzzleHttp\Client
+            $url = "http://192.168.5.83:8080/kixiagenda/public/api/loginAPI"; 
+            //$url = "http://kixiagenda.kixicredito.com/public/api/loginAPI";
+
+            $response = $client->request('POST', $url, [
+                'form_params' => [
+                    'username' => 'wawi.anto',
+                    'password' => 1990
+                ]
+            ]);
+            
+            $user = json_decode($response->getBody());    
+            
+            if($response->getStatusCode() == "200"){
+                dd($user);
+                return response()->json('Sincronizado com sucesso',200);
+            }else{
+                return response()->json('Erro ao efectuar login, tente novamente.');
+            }
+            
+        } catch (RequestException $e) {
+            echo GuzzleHttp\Psr7\str($e->getRequest());
+            if ($e->hasResponse()) {
+                echo GuzzleHttp\Psr7\str($e->getResponse());
+            }
+        }
     }
 
 }

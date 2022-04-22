@@ -46,37 +46,13 @@
     <div id="loader" class="loader">Loading...</div>
 
     <!-- Inicio do corpo -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <h7 style="color:#18af85a1;font-size:14px">TOTAL DE UTILIZADORES DO KIXIAGENDA: <span style="font-weight:bold;color:#18af85a1;font-size:14px">{{$contUtilizadoresKA}}</span></h7>    
-                        </div>
-                        <div class="col-6">
-                            <h7 class="float-right" style="color:#f5b119d4;font-size:14px">TOTAL DE UTILIZADORES DO KIXIPEDIDOS: <span style="font-weight:bold;color:#f5b119d4;font-size:14px">{{count($Utilizadores)}}</span></h7>    
-                        </div>
-                    </div><hr>
-                    @if($contUtilizadoresKA < count($Utilizadores))
-                    <div class="row">
-                        <div class="col-12">
-                            <a href="#" class="SalvarUtilizador btn btn-success float-right btn-sm btn-round"><i class="ti-arrow-up mr-2"></i>Enviar Utilizadores ao KA<a>
-                        </div>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-  
-    <br><br><br>
+    <br>
  
     <div class="row">
         <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <h4 style="text-align:center;color:#f5b119d4">UTILIZADORES DO KIXIPEDIDOS</h4>
+                <h4 style="text-align:center;color:#f5b119d4">UTILIZADORE DO KIXIPEDIDOS NÃO SINCRONIZADOS</h4>
                 <table id="#" class="table table-striped mb-0">
                     <thead>
                     <tr>
@@ -88,13 +64,15 @@
                     </tr>
                     </thead>
                     <tbody>
-                        @foreach($Utilizadores as $Utilizador)
+                        @foreach($usersFalta as $Utilizador)
                         <tr>
                             <td>{{$loop->iteration}}</td>
                             <td>{{$Utilizador->UtCodigo}}</td>
                             <td>{{$Utilizador->Nombre01.' '.$Utilizador->Nombre02.' '.$Utilizador->Nombre03}}</td>
                             <td>{{$Utilizador->departamento}}</td>
-                            <td>{{$Utilizador->CorreioI}}</td>
+                            <td>
+                                <a title="Sincronizar dados" href="#" username="{{$Utilizador->UtCodigo}}" class="sincronizar btn btn-primary btn-round btn-sm"><i class='fa fa-sync'> Sincronizar</i></a>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -107,24 +85,26 @@
     <!-- FIm do corpo -->
 </div>
 <script>
-    $(document).on('click','.SalvarUtilizador',function(e){
+    $(document).on('click','.sincronizar',function(e){
         
         document.getElementById("loader").style.display = "block";
 		e.preventDefault();
 
+        var username = $(this).attr('username');
+
         $.ajax({
-            url: "{{ url('salvarUtilizadornoKA') }}",
+            url: "{{ url('salvarUtilizadornoKA') }}/"+username,
             type: "GET",
             success: function(data){
                 document.getElementById("loader").style.display = "none";   
-                location.reload();    
-                alert('SUCESSO');    
+                location.reload(); 
+                alert("Sincronizado com Sucesso.");     
             },
             error: function(e)
             {
                 alert('ERRO AO SALVAR');                            
             }
-        });   
+        });  
     });  
 </script>
 @stop
