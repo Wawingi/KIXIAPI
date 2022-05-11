@@ -53,6 +53,16 @@ Route::post('importarTarefas','ConsumirAPIController@importarTarefas');
 
 Route::post('registarTeste','ConsumirAPIController@registarTeste');
 
+///////////Rotas Kixiclientes//////////
+Route::get('listarClientes','ClienteController@listarClientes');
+Route::get('salvarClientes','ClienteController@salvarClientesWeb');
+
+
+
+
+
+
+
 
 
 Route::get('testeLOGIN','ConsumirAPIController@testeLOGIN');

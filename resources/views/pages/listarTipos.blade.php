@@ -106,7 +106,6 @@
 </div>
 <script>
     $(document).on('click','.SalvarTipo',function(e){
-        
         document.getElementById("loader").style.display = "block";
 		e.preventDefault();
 
@@ -122,8 +121,7 @@
             {
                 alert('ERRO AO SALVAR');                             
             }
-        });   
-        
+        });        
     });  
 </script>
 @stop
