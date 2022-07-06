@@ -56,6 +56,8 @@ Route::post('registarTeste','ConsumirAPIController@registarTeste');
 ///////////Rotas Kixiclientes//////////
 Route::get('listarClientes','ClienteController@listarClientes');
 Route::get('salvarClientes','ClienteController@salvarClientesWeb');
+Route::get('exportarClientes','ClienteController@gerarJSONClientes');
+Route::get('exportarCabecalhos','ClienteController@gerarJSONCabecalho');
 
 
 

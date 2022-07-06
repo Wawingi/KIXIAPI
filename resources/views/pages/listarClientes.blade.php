@@ -47,64 +47,27 @@
     <hr>
     <!-- Inicio do corpo -->
     <div class="card">
+        <br>
         <div class="row">
-            <div class="col-lg-6"><br>
-                <h7 style="color:#18af85a1;font-size:16px">TOTAL DE CLIENTES LOCAL: <b>{{count($clientes)}}</b></h7>
+            <div class="col-6">
+                <h7 style="color:#18af85a1;font-size:16px">TOTAL DE CLIENTES: <b>{{$clientes}}</b></h7>
             </div>
            
-            <div class="col-lg-6"><br>
-                <a href="#" class="salvarClientes btn btn-success btn-sm btn-round float-right"><i class="ti-arrow-up mr-1"></i>Enviar Web<a>
-                <a href="{{ url('salvarClientes') }}" class="btn btn-primary btn-sm btn-round float-right"><i class="ti-arrow-up mr-1"></i>Enviar Web 2<a>
+            <div class="col-6">
+                <a href="{{ url('exportarClientes') }}" class="btn btn-primary btn-sm btn-round float-right mr-1"><i class="ti-arrow-down mr-1"></i>Exportar Clientes (JSON)</a>
             </div>
         </div>
-        <br><br>
-
-        <!--
+        <hr>        
         <div class="row">
-            <div class="card-body">
-                <table id="#" class="table table-striped mb-0">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Código Crédito</th>
-                        <th>Codigo Membro</th>
-                        <th>Loan Number</th>
-                        <th>Nome</th>
-                    </tr>
-                    </thead>
-                    <tbody>                       
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col-6">
+                <h7 style="color:#18af85a1;font-size:16px">TOTAL DE CABEÇALHOS: <b>{{$cabecalhos}}</b></h7>
             </div>
-        </div>-->
+           
+            <div class="col-6">
+            <a href="{{ url('exportarCabecalhos') }}" class="btn btn-primary btn-sm btn-round float-right mr-1"><i class="ti-arrow-down mr-1"></i>Exportar Cabeçalhos (JSON)</a>
+            </div>
+        </div><br>
     </div> 
     <!-- FIm do corpo -->
 </div>
-<script>
-    $(document).on('click','.salvarClientes',function(e){
-        document.getElementById("loader").style.display = "block";
-		e.preventDefault();
-        $.ajax({
-            url: "{{ url('salvarClientes') }}",
-            type: "GET",
-            success: function(data){
-                document.getElementById("loader").style.display = "none";   
-                location.reload();  
-                alert(data);         
-            },
-            error: function(e)
-            {
-                document.getElementById("loader").style.display = "none";   
-                alert('ERRO AO SALVAR');                             
-            }
-        });      
-    });     
-</script>
 @stop

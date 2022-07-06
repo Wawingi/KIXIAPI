@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Model\Cliente;
+use App\Model\Tarefa;
 use GuzzleHttp\Client;
+use File;
+use Response;
 //Use Exception;
 
 class ClienteController extends Controller
 {
     public function listarClientes(){
-        $clientes = Cliente::getClientes();
-        return view('pages.listarClientes',compact('clientes'));
+        $clientes = count(Cliente::getClientes());
+        $cabecalhos = count(Cliente::getCabecalho());
+        return view('pages.listarClientes',compact('clientes','cabecalhos'));
     }
 
     public function salvarClientesWeb(){
@@ -55,5 +59,27 @@ class ClienteController extends Controller
                 echo GuzzleHttp\Psr7\str($e->getResponse());
             }
         }
+    }
+
+    public function gerarJSONClientes(){
+        $clientes = Cliente::getClientes();
+
+        $data = json_encode($clientes,JSON_PRETTY_PRINT);
+        $jsongFile = date('d-m-Y') . '_clientes.json';
+       
+        File::put(public_path('/upload/json/'.$jsongFile), $data);
+
+        return Response::download(public_path('/upload/json/'.$jsongFile));
+    }
+
+    public function gerarJSONCabecalho(){
+        $cabecalhos = Cliente::getCabecalho();
+
+        $data = json_encode($cabecalhos,JSON_PRETTY_PRINT);
+        $jsonFile = date('d-m-Y') . '_cabecalhos.json';
+       
+        File::put(public_path('/upload/json/'.$jsonFile), $data);
+
+        return Response::download(public_path('/upload/json/'.$jsonFile));
     }
 }
