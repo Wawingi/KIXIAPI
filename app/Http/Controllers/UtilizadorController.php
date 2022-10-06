@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Model\Utilizador;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -34,5 +35,19 @@ class UtilizadorController extends Controller
         if(Auth::logout()==null)
            return redirect()->intended('/');
         
+    }
+
+    //Função logar API para todos local
+    public function loginAPI(Request $request){
+        $user = Utilizador::select('Nombre01','Nombre03','UtCodigo','departamento','Imagen')
+                    ->where('UtCodigo', $request->username)               
+                    ->where('UtSenha',sha1($request->password))
+                    ->where('Activo',1)
+                    ->first();
+
+        if (is_object($user)){         
+            return response()->json($user,200);
+        } else
+            return response()->json(0);
     }
 }
