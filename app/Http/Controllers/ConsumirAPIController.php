@@ -13,6 +13,7 @@ use App\Model\Origem;
 //Use Exception;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\TarefasImport;
+use App\Config\database;
 
 class ConsumirAPIController extends Controller
 {
@@ -492,6 +493,13 @@ class ConsumirAPIController extends Controller
                 echo GuzzleHttp\Psr7\str($e->getResponse());
             }
         }
+    }
+
+    public function listarProduto() {
+        //$fact=DB::table('tKxACTarefa')->get();
+        $users = DB::connection('sqlsrv2')->select('select * from Fatura.tbeConceito');
+    
+        dd($users);
     }
 
 }

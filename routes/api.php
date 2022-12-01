@@ -19,3 +19,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('loginAPI','UtilizadorController@loginAPI');
+
+Route::get('listarProduto','ConsumirAPIController@listarProduto');
+
+
+////// Faturacao ////
+Route::get('listarFaturaAPI', 'FaturaControllerAPI@listarFaturaAPI');
+Route::get('getDadosFactura/{codigoFactura}', 'FaturaControllerAPI@getDadosFacturaAPI');
+Route::get('getDadosEmpresa', 'FaturaControllerAPI@getDadosEmpresaAPI');
+Route::get('ClienteEspecifico/{cliente}', 'FaturaControllerAPI@ClienteEspecificoAPI');
