@@ -29,6 +29,8 @@ class FaturaControllerAPI extends Controller
         Fatura.tbeConceito AS S ON S.ccoCodigo = F1.ccoCodigo INNER JOIN
         Fatura.tbeIva AS I ON S.ccoCodigo = I.ccoCodigo INNER JOIN
         Cliente.tbeCliente AS C ON F.cleCodigo = C.cleCodigo COLLATE Modern_Spanish_CI_AI WHERE F.ccoNumero=' . $codigoFactura . '');
+
+        return $fatura;
     }
 
     public static function getDadosEmpresaAPI()
