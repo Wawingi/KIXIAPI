@@ -26,5 +26,6 @@ Route::get('listarProduto','ConsumirAPIController@listarProduto');
 ////// Faturacao ////
 Route::get('listarFaturaAPI', 'FaturaControllerAPI@listarFaturaAPI');
 Route::get('getDadosFactura/{codigoFactura}', 'FaturaControllerAPI@getDadosFacturaAPI')->where('codigoFactura', '(.*)');
+Route::get('getDadosItemFacturaAPI/{codigoFactura}', 'FaturaControllerAPI@getDadosItemFacturaAPI')->where('codigoFactura', '(.*)');
 Route::get('getDadosEmpresa', 'FaturaControllerAPI@getDadosEmpresaAPI');
-Route::get('ClienteEspecifico/{cliente}', 'FaturaControllerAPI@ClienteEspecificoAPI');
+Route::get('ClienteEspecifico/{cliente}', 'FaturaControllerAPI@ClienteEspecificoAPI')->where('cliente', '(.*)');

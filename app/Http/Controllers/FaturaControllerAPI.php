@@ -22,14 +22,10 @@ class FaturaControllerAPI extends Controller
 
     public static function getDadosFacturaAPI($codigoFactura)
     {
-        $codigoFactura = "'$codigoFactura'";
-        $fatura = DB::connection('sqlsrv2')->select('SELECT F.ccoNumero, F.SAFTInvoiceNo,C.cleNomeCliente AS cleNomeCliente, F1.ccoCodigo, F.cleCodigo, F.ccoDataEmissao, F.ccoDataRegisto, F.ccoSubTotal, F.ccoIVA, F.ccoTotal, S.ccoDescripcao AS Designacao, F1.dteMontante, F1.dteIva AS dteMontante, F1.ivaRegime,I.SAFTTaxExemptionCode AS TaxExemptionCode, I.ivaPercentagem AS TaxPercentage, 
-        1 AS quantidade FROM            Fatura.tbeCabecalho AS F INNER JOIN
-        Fatura.tbeDetalhe AS F1 ON F.ccoNumero = F1.ccoNumero INNER JOIN
-        Fatura.tbeConceito AS S ON S.ccoCodigo = F1.ccoCodigo INNER JOIN
-        Fatura.tbeIva AS I ON S.ccoCodigo = I.ccoCodigo INNER JOIN
-        Cliente.tbeCliente AS C ON F.cleCodigo = C.cleCodigo COLLATE Modern_Spanish_CI_AI WHERE F.ccoNumero=' . $codigoFactura . '');
 
+        $codigoFactura = "'$codigoFactura'";
+        $fatura = DB::connection('sqlsrv2')->select('SELECT F.ccoNumero, F.SAFTInvoiceNo, F.cleCodigo, F.ccoDataEmissao, F.ccoDataRegisto, F.ccoSubTotal, F.ccoIVA, F.ccoTotal FROM  Fatura.tbeCabecalho AS F WHERE F.ccoNumero=' . $codigoFactura . '');
+        //    dd($fatura);
         return $fatura;
     }
 
@@ -44,5 +40,14 @@ class FaturaControllerAPI extends Controller
         $codigoFactura = "'$codigoCliente'";
         $clientes = DB::connection('sqlsrv2')->select('SELECT * FROM Cliente.tbeCliente WHERE Cliente.tbeCliente.cleCodigo=' . $codigoFactura . '');
         return $clientes;
+    }
+
+    public static function getDadosItemFacturaAPI($codigoFactura)
+    {
+
+        $codigoFactura = "'$codigoFactura'";
+        $fatura = DB::connection('sqlsrv2')->select('SELECT C.ccoNome AS designacao , F1.dteMontante AS dteMontante,I.ivaPercentagem AS IVA, I.SAFTTaxExemptionCode AS SAFTTaxExemptionCode FROM Fatura.tbeDetalhe AS F1 INNER JOIN Fatura.tbeConceito C ON F1.ccoCodigo = C.ccoCodigo 
+        INNER JOIN Fatura.tbeIva I ON I.ccoCodigo = C.ccoCodigo WHERE F.ccoNumero=' . $codigoFactura . '');
+        return $fatura;
     }
 }
